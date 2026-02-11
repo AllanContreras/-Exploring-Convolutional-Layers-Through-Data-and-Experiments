@@ -105,20 +105,11 @@ pip install -r requirements.txt
 - Visualiza filtros/feature maps con capas intermedias.
 
 ## Evidencia de SageMaker
-- Entrenamiento: captura del Job en la consola de SageMaker.
-  
-  ![Job de entrenamiento](docs/images/sagemaker_training_job.png)
-- Logs: extracto de CloudWatch de la corrida.
-  
-  ![Logs de CloudWatch](docs/images/sagemaker_cloudwatch_logs.png)
-- Artefactos en S3: listado del bucket y carpeta de outputs.
-  
-  ![Artefactos en S3](docs/images/sagemaker_s3_artifacts.png)
-- Endpoint: invocación, respuesta y latencia.
-  
-  ![Invocación a endpoint](docs/images/sagemaker_endpoint_invocation.png)
 
-## Resultados en Imágenes
+
+<img width="1867" height="841" alt="image" src="https://github.com/user-attachments/assets/d3a7279c-dbc4-4d28-b79a-f486937e1e94" />
+<img width="1914" height="738" alt="image" src="https://github.com/user-attachments/assets/07212a67-7db3-4524-9dd6-d97aacdb415a" />
+
 - Curvas de entrenamiento/validación:
   
   <img width="1262" height="601" alt="image" src="https://github.com/user-attachments/assets/c8549295-f83c-4e87-8ae5-025f50cdc758" />
