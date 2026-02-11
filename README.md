@@ -29,9 +29,63 @@ Explorar el efecto de decisiones arquitectónicas en capas convolucionales (CNN)
 - Beneficia tareas con estructura espacial en imágenes.
 - No apropiada en datos tabulares o sin relación posicional clara.
 
-## SageMaker
-- Usa SDK de SageMaker con `train.py` empaquetado.
+## SageMaker (pendiente al final)
+- Preparar `train.py` e `inference.py` compatibles con SageMaker.
 - Requiere `role` IAM, `bucket` S3 y credenciales AWS configuradas.
+- Configurar un `Estimator` y entrenar (`fit`), luego desplegar (`deploy`).
+- Probar el endpoint y realizar teardown para evitar costos.
+
+### Cómo lanzar entrenamiento con SageMaker (ejemplo)
+```python
+import sagemaker
+from sagemaker.tensorflow import TensorFlow
+
+session = sagemaker.Session()
+role = "arn:aws:iam::<ACCOUNT_ID>:role/<SageMakerExecutionRole>"  # TODO
+
+estimator = TensorFlow(
+  entry_point="sagemaker/train.py",
+  role=role,
+  instance_type="ml.m5.large",
+  instance_count=1,
+  framework_version="2.13",
+  py_version="py310",
+  hyperparameters={
+    "epochs": 5,
+    "batch_size": 128,
+    "lr": 1e-3,
+    "kernel_size": 3,
+    "dropout": 0.3,
+    "seed": 42,
+  },
+  code_location=session.default_bucket(),  # opcional, dónde guardar código
+  output_path=f"s3://{session.default_bucket()}/fashion-mnist-cnn/outputs/",
+)
+
+# Si tienes datos en S3 (opcional):
+# inputs = sagemaker.inputs.TrainingInput(
+#     s3_data=f"s3://{session.default_bucket()}/fashion-mnist-cnn/data/",
+#     distribution="FullyReplicated",
+# )
+# estimator.fit(inputs)
+
+# Sin datos externos (usa Fashion-MNIST interno):
+estimator.fit()
+
+predictor = estimator.deploy(
+  initial_instance_count=1,
+  instance_type="ml.m5.large"
+)
+
+# Invocar endpoint (ejemplo JSON con una imagen 28x28)
+import numpy as np, json
+img = np.zeros((28,28), dtype=np.float32).tolist()
+response = predictor.predict(json.dumps([img]))
+print(response)
+
+# Teardown (cuando termines)
+predictor.delete_endpoint()
+```
 
 ## Setup
 Instala dependencias:
@@ -44,7 +98,54 @@ pip install -r requirements.txt
 
 ## Run
 - Abre el notebook y ejecuta las celdas en orden.
+- Al finalizar, ejecuta la última celda para guardar modelos y métricas en `models/` y `artifacts/`.
 - Para SageMaker, configura variables de entorno `SAGEMAKER_EXECUTION_ROLE` y `S3_BUCKET` o edita directamente en la celda.
 
 ## Optional (bonus)
 - Visualiza filtros/feature maps con capas intermedias.
+
+## Evidencia de SageMaker
+- Entrenamiento: captura del Job en la consola de SageMaker.
+  
+  ![Job de entrenamiento](docs/images/sagemaker_training_job.png)
+- Logs: extracto de CloudWatch de la corrida.
+  
+  ![Logs de CloudWatch](docs/images/sagemaker_cloudwatch_logs.png)
+- Artefactos en S3: listado del bucket y carpeta de outputs.
+  
+  ![Artefactos en S3](docs/images/sagemaker_s3_artifacts.png)
+- Endpoint: invocación, respuesta y latencia.
+  
+  ![Invocación a endpoint](docs/images/sagemaker_endpoint_invocation.png)
+
+## Resultados en Imágenes
+- Curvas de entrenamiento/validación:
+  
+  ![Curvas baseline](docs/images/baseline_curves.png)
+  
+  ![Curvas CNN](docs/images/cnn_curves.png)
+- Matriz de confusión (test, CNN):
+  
+  ![Matriz de confusión](docs/images/confusion_matrix_cnn.png)
+- Ejemplos de predicciones correctas e incorrectas:
+  
+  ![Ejemplos de predicciones](docs/images/prediction_examples.png)
+- Visualización de filtros/feature maps (capas intermedias):
+  
+  ![Feature maps](docs/images/feature_maps.png)
+
+## Conclusiones
+- Rendimiento: TODO reemplazar con métricas de test (baseline vs CNN 3x3 vs 5x5).
+- Arquitectura: la CNN 3x3 suele equilibrar capacidad y eficiencia en Fashion-MNIST; 5x5 puede captar patrones más amplios a costo de parámetros.
+- Sesgo inductivo: la convolución introduce localidad, compartición de pesos e invariancia a traslación, beneficiando imágenes.
+- Limitaciones: datos fuera del dominio visual o dependencias no locales podrían requerir otras arquitecturas (Transformers/GNNs).
+- Despliegue: SageMaker permite escalar entrenamiento e inferencia; monitoreo y costos deben gestionarse.
+
+## Explicación de lo hecho
+- EDA: exploramos distribución de clases y ejemplos por clase, normalizamos a [0,1].
+- Baseline: entrenamos una red densa para establecer referencia (accuracy/loss, train/val/test).
+- CNN: diseñamos y entrenamos una arquitectura con 2 conv (3x3), pooling y capa densa.
+- Experimentos: comparamos kernels 3x3 vs 5x5 manteniendo hiperparámetros fijos.
+- Evaluación: graficamos curvas, calculamos métricas y guardamos modelos/métricas en `models/` y `artifacts/`.
+- Reproducibilidad: fijamos semillas y generamos `requirements.txt`.
+- Despliegue (pendiente): dejaremos scripts y evidencia de SageMaker en esta sección.
