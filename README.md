@@ -29,63 +29,6 @@ Explorar el efecto de decisiones arquitectónicas en capas convolucionales (CNN)
 - Beneficia tareas con estructura espacial en imágenes.
 - No apropiada en datos tabulares o sin relación posicional clara.
 
-## SageMaker (pendiente al final)
-- Preparar `train.py` e `inference.py` compatibles con SageMaker.
-- Requiere `role` IAM, `bucket` S3 y credenciales AWS configuradas.
-- Configurar un `Estimator` y entrenar (`fit`), luego desplegar (`deploy`).
-- Probar el endpoint y realizar teardown para evitar costos.
-
-### Cómo lanzar entrenamiento con SageMaker (ejemplo)
-```python
-import sagemaker
-from sagemaker.tensorflow import TensorFlow
-
-session = sagemaker.Session()
-role = "arn:aws:iam::<ACCOUNT_ID>:role/<SageMakerExecutionRole>"  # TODO
-
-estimator = TensorFlow(
-  entry_point="sagemaker/train.py",
-  role=role,
-  instance_type="ml.m5.large",
-  instance_count=1,
-  framework_version="2.13",
-  py_version="py310",
-  hyperparameters={
-    "epochs": 5,
-    "batch_size": 128,
-    "lr": 1e-3,
-    "kernel_size": 3,
-    "dropout": 0.3,
-    "seed": 42,
-  },
-  code_location=session.default_bucket(),  # opcional, dónde guardar código
-  output_path=f"s3://{session.default_bucket()}/fashion-mnist-cnn/outputs/",
-)
-
-# Si tienes datos en S3 (opcional):
-# inputs = sagemaker.inputs.TrainingInput(
-#     s3_data=f"s3://{session.default_bucket()}/fashion-mnist-cnn/data/",
-#     distribution="FullyReplicated",
-# )
-# estimator.fit(inputs)
-
-# Sin datos externos (usa Fashion-MNIST interno):
-estimator.fit()
-
-predictor = estimator.deploy(
-  initial_instance_count=1,
-  instance_type="ml.m5.large"
-)
-
-# Invocar endpoint (ejemplo JSON con una imagen 28x28)
-import numpy as np, json
-img = np.zeros((28,28), dtype=np.float32).tolist()
-response = predictor.predict(json.dumps([img]))
-print(response)
-
-# Teardown (cuando termines)
-predictor.delete_endpoint()
-```
 
 ## Setup
 Instala dependencias:
@@ -101,8 +44,7 @@ pip install -r requirements.txt
 - Al finalizar, ejecuta la última celda para guardar modelos y métricas en `models/` y `artifacts/`.
 - Para SageMaker, configura variables de entorno `SAGEMAKER_EXECUTION_ROLE` y `S3_BUCKET` o edita directamente en la celda.
 
-## Optional (bonus)
-- Visualiza filtros/feature maps con capas intermedias.
+
 
 ## Evidencia de SageMaker
 
