@@ -121,15 +121,22 @@ pip install -r requirements.txt
 ## Resultados en Imágenes
 - Curvas de entrenamiento/validación:
   
-  ![Curvas baseline](docs/images/baseline_curves.png)
+  <img width="1262" height="601" alt="image" src="https://github.com/user-attachments/assets/c8549295-f83c-4e87-8ae5-025f50cdc758" />
+
+
   
-  ![Curvas CNN](docs/images/cnn_curves.png)
+  <img width="1372" height="598" alt="image" src="https://github.com/user-attachments/assets/2ef5a4d0-052f-4b4d-bb29-1efc527b694b" />
+<img width="1377" height="581" alt="image" src="https://github.com/user-attachments/assets/f8234c7b-e259-4d2d-9538-bc39f0fb686c" />
+
 - Matriz de confusión (test, CNN):
   
-  ![Matriz de confusión](docs/images/confusion_matrix_cnn.png)
+  <img width="1070" height="412" alt="image" src="https://github.com/user-attachments/assets/0083547b-c0b5-4328-8f1f-bbd2159b5538" />
+<img width="996" height="619" alt="image" src="https://github.com/user-attachments/assets/1a285610-957a-44ae-bc84-b27edfd34988" />
+
 - Ejemplos de predicciones correctas e incorrectas:
   
-  ![Ejemplos de predicciones](docs/images/prediction_examples.png)
+  <img width="1485" height="821" alt="image" src="https://github.com/user-attachments/assets/5568fd2a-0570-4f3e-ab0e-2b3c2e44b0f6" />
+
 - Visualización de filtros/feature maps (capas intermedias):
   
   ![Feature maps](docs/images/feature_maps.png)
