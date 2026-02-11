@@ -70,9 +70,7 @@ pip install -r requirements.txt
   
   <img width="1485" height="821" alt="image" src="https://github.com/user-attachments/assets/5568fd2a-0570-4f3e-ab0e-2b3c2e44b0f6" />
 
-- Visualización de filtros/feature maps (capas intermedias):
-  
-  ![Feature maps](docs/images/feature_maps.png)
+
 
 ## Conclusiones
 - Rendimiento: TODO reemplazar con métricas de test (baseline vs CNN 3x3 vs 5x5).
